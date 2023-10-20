@@ -1,0 +1,94 @@
+---
+title: "week4sgta"
+author: "Al"
+date: "2023-08-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+## Question 1
+### a, b, c, d
+
+```{r}
+iron <- read.table("SGTADATASETS/iron.txt", header = TRUE)
+iron.aov = aov(content ~ formation, data = iron)
+
+#First check for variances, visualization or rule of thumb or f-test/barlett's test
+boxplot(content ~ formation, data = iron)
+
+#bartlett.test(content ~ formation, data = iron)
+
+ns = with(iron, tapply(iron$content, iron$formation, length)) 
+means = with (iron, tapply(iron$content, iron$formation, mean)) 
+sds = with (iron, tapply(iron$content, iron$formation, sd)) 
+iron_summary = data.frame(n= ns, mean = means, sd = sds)
+max(iron_summary$sd)/min(iron_summary$sd)<2
+
+#Check for normality of residuals
+par(mfrow = c(1,2))
+{qqnorm(iron.aov$residuals)
+qqline(iron.aov$residuals)}
+
+summary(iron.aov)
+```
+
+## Question 2
+### a. 
+From this we can ascertain that the F-Distribution is F_{5, 36}. 
+
+### b. 
+We need F_{5, 36} > 3.47. The closest I could find is F_{5, 30}, which has 0.01 < P-Value < 0.025.
+
+## Question 3
+It is planned to carry out a similar experiment with the 4 different iron formations (i.e., t = 4). In obtaining
+an estimate of the inherent variability in the experiment, it would be preferred to have at least 30 degrees
+of freedom for the estimate of random variation σ2 (i.e., Error M.S. or MSE).
+
+### a.
+Since we need at least 30 df, we need at least 34 observations. So, we need 9 replications.
+
+### b.
+Repeat the above exercise if we wish to obtain an estimate with at least 40 degrees of freedom. 
+
+11.
+
+### c.
+If it is decided to expand the experiment to assess 8 different iron formations (t = 8). Again, assuming
+equal replication, find the number of replicates necessary to obtain at least:
+a. 30 df
+b. 40 df
+
+a. 5
+b. 6
+
+# Part 2
+## Question 1
+### a
+The medians of the logarithm of cases are quite different for the three brands. Based on the boxplots’ interquartile range, the spread for the logarithm of cases is similar for all three brands.
+
+### b
+The residual vs. fitted plot exhibits a fan shape. Also, the QQ plot of residuals shows a pattern of deviations from normality, especially on the right-hand side of the graph. So the assumptions for ANOVA are not fully met.
+
+### c
+• Constant variance assumption; can be checked by residuals against fitted value, max sd/min sd<2,
+Bartlett test.
+• Normality assumption; can be checked by the qq-plot of the residuals, or a histogram of the residuals.
+• Independence in the data assumption; this cannot be verified from the data but can be
+checked/investigated if we had information about how the data were collected.
+
+### d
+We are given that treatment has df=2, and residual has df = 94, SS = 252.93, and MS = 2.69. Also, F-value = 21.28. Missing for treatment are MS = 57.24, and SS = 114.48.
+
+### e
+There is evidence against H0.
+
+
+
+
+
+
+

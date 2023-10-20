@@ -1,0 +1,7 @@
+categ_dat = read.csv("categ_data.csv", header=TRUE)
+
+
+categANOVA=aov(dbp ~ as.factor(chol_level)*as.factor(diet), data=categ_dat)
+summary(categANOVA) 
+
+table(data[,2:3])

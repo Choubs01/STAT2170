@@ -1,0 +1,58 @@
+---
+title: "week2sgta"
+author: "Al"
+date: "2023-08-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+```{r}
+melt <- read.table("SGTADATASETS/melt.dat", header = TRUE)
+str(melt)
+head(melt)
+head(melt$meltpoint)
+```
+
+## Question 1
+### a
+```{r}
+#Part a
+mp = melt$meltpoint
+
+par(mfrow = c(1,2)) #Shows both plots at once
+hist(mp, main = "Histogram of Melting Point of Fat", xlab = "Melting Point (Celcius")
+boxplot(mp, main = "Histogram of Melting Point of Fat", xlab = "Melting Point (Celcius")
+
+stem(mp)
+```
+
+### b
+```{r}
+summary(mp)
+mean(mp)
+sd(mp)
+length(mp)
+dim(melt)
+```
+
+## Question 2
+```{r}
+t.test(mp, mu = 94.4)
+```
+
+## Question 3
+```{r}
+t.test(mp, my=94.4, conf.level = 0.99)
+```
+
+## Question 4
+```{r}
+t.test(melt$meltpoint, mu = 94.4, alternative = "less")
+```
+
+
+

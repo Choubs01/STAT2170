@@ -1,0 +1,32 @@
+---
+title: "week7sgta"
+author: "Al"
+date: "2023-09-06"
+output: html_document
+---
+
+# Part 1
+## Question 2
+### a
+```{r}
+week7 <- read.csv('SGTADATASETS/week7.csv', header = TRUE)
+colnames(week7)
+```
+
+### b
+```{r}
+week7$BMI = week7$Weight/(week7$Height / 100)^2
+week7$BMI = round(week7$BMI, 2)
+
+old = c("M", "F")
+new = c("Male", "Female")
+week7$Gender = new[match(week7$Gender, old)]
+
+mean(week7$Height)
+
+#Get Rosalie's waste
+week7[which(week7$Name == 'Rosalie'), 8]
+
+subset(week7, Name %in% c('Rosalie', 'Aimen'))
+```
+

@@ -1,0 +1,113 @@
+---
+title: "week8sgta"
+author: "Al"
+date: "2023-09-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+## Question 1
+### a
+```{r}
+ecoli = read.table("SGTADATASETS/ecoli.txt", header = TRUE)
+str(ecoli)
+{plot(HEC ~ HGMF, data = ecoli)
+  abline(lm(HEC ~ HGMF, data = ecoli))}
+```
+
+### b)
+```{r}
+ecoli.lm = lm(HEC ~ HGMF, data = ecoli)
+summary(ecoli.lm)
+```
+### c)
+```{r}
+plot(ecoli.lm, which = 1:2)
+```
+The residual plot has a large outlier, which is also influencing the qqplot evident by its left skew.
+
+### d)
+There are two ways to identify the outlier:
+
+#### 'Plotting' Way
+We have already used this in the former plots. Conveniently the furthest points are labelled. In this case observation 18 is the outlier.
+
+#### Manual Way
+If the points weren't labelled, we can see that the outlier is close to -1. So we can call:
+```{r}
+badpoint = which(ecoli.lm$residuals < -0.5)
+badpoint
+```
+
+### e)
+```{r}
+cleanEcoli = ecoli[-badpoint, ]
+
+better.ecoli.lm = lm(HEC ~ HGMF, data = cleanEcoli)
+plot(better.ecoli.lm, which = 1:2)
+```
+The quantile plot and residual plot look much better once the outlier is removed, there is a nice linear
+trend in the Q-Q plot and no obvious pattern or outlier in the residual plot. Plotting the new analysis
+and adding the prediction and confidence intervals.
+
+```{r}
+plot(HEC ~ HGMF, data = cleanEcoli)
+abline(better.ecoli.lm)
+# Create sequence of points
+hgmfgrid <- seq(from = -1, to = 3, by = 0.5)
+# Put in a dataframe with the same name as the predictor (HGMF)
+HGMFdat <- data.frame(HGMF = hgmfgrid)
+# Create the intervals
+predvals <- predict.lm(better.ecoli.lm, newdata = HGMFdat, interval = 'prediction')
+confvals <- predict.lm(better.ecoli.lm, newdata = HGMFdat, interval = 'confidence')
+# Add prediction bands to plot, lty = 2 creates dashed line
+# Note lty is short for 'line type'
+lines(hgmfgrid, predvals[, 2], lty = 2)
+lines(hgmfgrid, predvals[, 3], lty = 2)
+# Add confidence bands to plot, lty = 3 creates dotted line
+lines(hgmfgrid, confvals[, 2], lty = 3)
+lines(hgmfgrid, confvals[, 3], lty = 3)
+```
+
+
+```{r}
+bandind = which(hgmfgrid == 1)
+bandind
+
+predband1 = predvals[bandind, 2:3]
+confband1 = confvals[bandind, 2:3]
+
+predband1
+confband1
+```
+## Question 2
+```{r}
+summary(better.ecoli.lm)
+```
+HGMF = 0.91568, and the standard error is 0.04356. 
+```{r}
+qt(0.975, 15)
+```
+0.91568 ± 2.1314495 × 0.04356 = (0.82283, 1.00853)
+
+## Question 3
+IDK4now
+
+## Question 4
+```{r}
+anova(better.ecoli.lm)
+
+```
+
+## Question 5
+Generally speaking, the model assumes that the predictor is measured without error. On paper, that means
+we should use the more accurate variable as the predictor. Here we are assuming that as HGMF is a more
+complex method that it should have a lower error (otherwise what’s the point of having this new method!).
+In this type of problem, other techniques are required to obtain a predicted HGMF from HEC, see section
+11.6 of Ott and Longnecker, An Introduction to Statistical Methods and Data Analysis.
+In reality, there are other factors to consider, such as the cost and ease to obtain the predictor and response.
+Things are often less clear in most applied studies, and it is up to you to make a case for it

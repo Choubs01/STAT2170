@@ -1,0 +1,69 @@
+---
+title: "week6sgta"
+author: "Al"
+date: "2023-10-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+## Question 1
+### a
+```{r}
+dough <- read.table('SGTADATASETS/dough.txt', header = TRUE)
+head(dough)
+
+dough.aov = aov(times ~ recipe, data = dough)
+
+par(mfrow = c(1, 2))
+{qqnorm(dough.aov$residuals, main = 'Normal Q-Q plot of residuals')
+  qqline(dough.aov$residuals)}
+boxplot(times ~ recipe, data = dough,
+main = "Times by recipe",
+ylab = "Times", xlab = "Recipe")
+```
+The boxplot shows some difference in variance between recipes. However, there are only four observations per recipe, therefore we expect some variation differences. Equal variance assumption seems OK in this context.
+The Normal Q-Q plot of residuals has a linear trend suggesting the residuals are close to normally distributed.
+
+### b
+```{r}
+summary(dough.aov)
+```
+Since the P-Value is less than the significance level of 0.05 (5%) we have evidence
+to reject H0 in favour of H1. That is, we have evidence that the cooking time is not all the same
+for the different recipes.
+
+### c
+```{r}
+pairwise.t.test(dough$times, dough$recipe, p.adj = "none")
+```
+This method does pairwise t-tests across all the different groups. However before continuing we need to adjust the P values.
+```{r}
+pairwise.t.test(dough$times, dough$recipe, p.adj = "bonf")
+```
+Looking at the output we can see that Recipe A is significantly different to Recipes C and D; Recipe
+D is significantly different to Recipes E and F; while other comparisons are not significantly different.
+
+```{r}
+TukeyHSD(dough.aov, ordered = FALSE)
+```
+This time with Tuskey's HSD adjustment, similar conclusions are reached (with different adjusted p-values obviously). Recipe A is significantly
+different to Recipes C and D; Recipe D is significantly different to Recipes E and F; while other comparisons are not significantly different.
+
+### d
+```{r}
+kruskal.test(times ~ recipe, data = dough)
+```
+Based on the Kruskal-Wallis test, we conclude at 5% significance level that not all median times (taken
+for the dough to rise) of the 6 recipes are the same as the p-value of 0.011 is small (< 0.05).
+The p-value obtained from the Kruskal-Wallis test here is 0.011 that is much larger than that from
+the ANOVA using the F test (p-value = 0.001) as expected, knowing that the Kruskal-Wallis is only
+based on the ranks (order) of the data (information of the magnitude of the differences of that ranked
+order is lost).
+For the data in this question, it is more appropriate to use the more sensitive method, ANOVA, as its
+assumptions including normality is held by the data (shown earlier). The Kruskal-Wallis test does not
+assume normality and does not include the magnitude of the differences in the data, only the ranks.
+Therefore is less sensitive or powerful in detecting a real difference.

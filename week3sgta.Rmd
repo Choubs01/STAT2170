@@ -1,0 +1,97 @@
+---
+title: "week3sgta"
+author: "Al"
+date: "2023-08-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+## Question 1
+
+We will conduct a two sample, two tailed unpaired t-test since the population SD is unknown and we're looking for a change in the means. The null hypothesis will assume equal means. However we should first check assumptions. 
+- Normal distribution 
+- Large enough sample size
+- Equal variances
+There's also the assumption of independance however this cannot be verified.
+```{r}
+light <- read.table("SGTADATASETS/light.dat", header = TRUE)
+
+#Check normal distribution
+par(mfrow = c(1, 2))
+{qqnorm(light$Brand1)
+qqline(light$Brand1)}
+{qqnorm(light$Brand2)
+qqline(light$Brand2)} 
+#Both plots follow normal distribution, safe assumption
+
+#Check whether variance is equal
+c(sd(light$Brand1), sd(light$Brand2))
+boxplot(light) 
+#The distributions are pretty similar, safe assumption 
+```
+
+Since we have determined the assumptions, we can move forward with our calculations.
+
+```{r}
+t.test(light$Brand1, light$Brand2, var.equal = TRUE)
+```
+
+Since p-value = 0.037 < 0.05, we have evidence to reject the null hypothesis and so there is reason to believe the lumen levels are different between both brands. The mean of brand 1 is 80.3, and brand 2 is 67.4. We are 95% confident that the brightness level of brand 1 light bulbs is, on average, [0.84, 24.98] lumens brighter than brand 2. 
+
+## Question 2
+We will conduct a paired t-test as the two plots are related. We will conduct a t-test on the differences with null hypothesis mu_d = 0, and alternative hypothesis my_d > 0. This will require a two tailed t-test. We should first check assumptions:
+- Independence
+- Normality of differences
+
+```{r}
+farm <- read.table("SGTADATASETS/farm.dat", header = TRUE)
+difference = farm$yield[farm$plot == "sprayed"] - farm$yield[farm$plot == "unsprayed"]
+
+#Check normality
+boxplot(difference)
+{qqnorm(difference) 
+qqline(difference)}
+```
+The data shows there is a deviation in the lower tail area. We can exclude an outlier however the deviation remains. We will continue assuming normality despite this.
+
+```{r}
+t.test(difference, alternative = 'g')
+#t.test(yield ~ plot, paired = TRUE, data = farm, alternative = 'g')
+```
+We have found that p-value of the differences = 0.022 < 0.05. We have evidence to reject the null hypothesis and believe that the true mean of the differences is greater than 0 i.e. spraying increases crop yields. We are 95% confident that, on average, spraying yields crops that are greater by 0.56 units.
+
+## Question 3
+Since the gravel levels are from two different types of soil selected at random, we can apply the two sample t-
+test to compare the mean parameters in fine gravel levels. This test will be valid so long as the measurements
+are independent of each other and the measurements are close to normally distributed. There is no preference
+as to the difference so we do a two-sided test.
+
+```{r}
+fertile <- read.table("SGTADATASETS/fertile.dat", header = TRUE)
+
+#Check normality
+par(mfrow = c(1,2))
+{qqnorm(fertile$fertile)
+  qqline(fertile$fertile)}
+{qqnorm(fertile$nonfertile)
+  qqline(fertile$nonfertile)}
+
+#Check variance
+c(sd(fertile$fertile), sd(fertile$nonfertile))
+boxplot(fertile)
+```
+While there is evidence of normality, the boxplots show too large of a difference in variances, so we must operate on the assumption
+of unequal variances.
+```{r}
+t.test(fertile$fertile, fertile$nonfertile, ver.equal = FALSE)
+```
+Since our P-Value is 0.21294 > α = 0.05, we do not have evidence against H0 suggesting that the
+means are not significantly different for the two soil types. That is, we don’t have evidence to suggest
+the different soil types have different fine gravel levels.
+
+
+

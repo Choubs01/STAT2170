@@ -1,0 +1,122 @@
+---
+title: "week9sgta"
+author: "Al"
+date: "2023-10-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+## Question 1
+### a
+```{r}
+aisfemales <- read.csv("SGTADATASETS/aisfemales.csv", header = TRUE)
+plot(aisfemales)
+#pairs(aisfemales, panel = panel.smooth)
+```
+LBM is highly correlated with Wt, less so but still highly correlated with Ht, with a high correlation
+between Ht and Wt. Only slight correlation between LBM and RCC and Hg. High correlation
+between Hg and RCC but not with other predictors
+
+### b
+```{r}
+ais.1 <- lm(LBM ~ Ht + Wt + RCC + Hg, data = aisfemales)
+summary(ais.1)
+```
+```{r}
+par(mfrow = c(1, 2))
+plot(ais.1, which = 1:2)
+```
+```{r}
+par(mfrow = c(2, 2))
+plot(resid(ais.1) ~ Ht + Wt + RCC + Hg, data = aisfemales)
+```
+1. The Normal Q-Q plot of residuals has a slight curvature but close to linear implying errors close to
+normally distributed.
+2. The residuals vs fitted has no discernible pattern.
+3. Residuals vs predictor plots no obvious pattern. So the linear model seems adequate
+
+### c
+```{r}
+ais.2 <- lm(LBM ~ Ht + Wt + Hg, data = aisfemales)
+summary(ais.2)
+```
+From output we can see Hg has increased in significance from a P-Value from 0.0364 to 0.00487.
+There was correlated information in RCC that has been removed that Hg is now providing (hence more
+significant)
+
+```{r}
+par(mfrow = c(1, 2))
+plot(ais.2, which = 1:2)
+```
+```{r}
+par(mfrow = c(1, 3))
+plot(resid(ais.2) ~ Ht + Wt + Hg, data = aisfemales)
+```
+Quantile plot looks linear and residual plots have no pattern, suggesting linear model still adequate.
+The loss in R2 is only a percent, suggesting reduced model is better.
+
+### d
+```{r}
+anova(ais.1)
+anova(ais.2)
+```
+SS(ais.1) - SS(ais.2) = 1.27.
+
+```{r}
+anova(aov(LBM ~ Ht + Wt + Hg + RCC, data = aisfemales))
+```
+
+
+### e
+```{r}
+summary(ais.2)$coefficients
+```
+(0.4523, 0.5873). 
+
+## Question 2
+```{r}
+lifeexp <- read.table("SGTADATASETS/lifeexp.txt", header = TRUE)
+```
+
+### a
+```{r}
+pairs(lifeexp, panel = panel.smooth)
+```
+Appears to be nonlinear, People per TV and Doctor both highly skewed.
+
+### b
+```{r}
+lifeexp$logpptv = log(lifeexp$People.per.TV)
+lifeexp$logppd = log(lifeexp$People.per.Dr)
+
+head(lifeexp)
+```
+```{r}
+pairs(LifeExp ~ logpptv + logppd, data = lifeexp,
+panel = panel.smooth)
+```
+Structure in the data between the response and log predictors looks much more linear. We should be
+able to fit a linear model now to this data.
+
+### c
+```{r}
+life.1 <- lm(LifeExp ~ logpptv + logppd, data = lifeexp)
+
+par(mfrow = c(2, 2))
+plot(life.1, which = 1:2)
+plot(resid(life.1) ~ logpptv + logppd, data = lifeexp)
+```
+Quantile plot looks close to linear, some divergence away from linear. So errors near close to normally
+distributed. Residual plots have no pattern, suggesting linear model adequate.
+
+
+### d
+```{r}
+summary(life.1)
+```
+Might have to come back for answer.
+
