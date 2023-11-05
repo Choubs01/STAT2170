@@ -1,0 +1,119 @@
+---
+title: "week11sgta"
+author: "Al"
+date: "2023-11-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+## Question 1
+```{r}
+bone = read.table("SGTADATASETS/bone-growth.dat", header = TRUE)
+head(bone)
+```
+```{r}
+table(bone[1:2])
+```
+We see that the study is unbalanced, so order will matter when conducting ANOVA.
+
+```{r}
+with(bone, interaction.plot(bone.dev, gender, growth, col = 1:2))
+with(bone, interaction.plot(gender, bone.dev, growth, col = 1:3))
+```
+There seems to be interaction given lines aren't parallel however it is important to consider the small number of observations for each factor.
+
+```{r}
+boxplot(growth ~ gender + bone.dev, data = bone)
+```
+The boxplot appears to show constant variability between levels of each factor, except for the females with
+severe development. However, this group has only 1 observation. 
+
+```{r}
+bone.1 = lm(growth ~ gender, data = bone)
+anova(bone.1)
+```
+We can see that gender does not appear to contribute any significant effect on growth.
+
+```{r}
+bone.2 = lm(growth ~ gender + bone.dev, data = bone)
+anova(bone.2)
+```
+bone.dev has significant effect. Gender still insignificant. In this model the SS of gender remained the same (as SS is calculated sequentially). However the SS of residuals reduced and went to bone.dev.
+
+```{r}
+bone.2rev = lm(growth ~ bone.dev + gender, data = bone)
+anova(bone.2rev)
+```
+We notice that the SS values and consequently, the P-Values are slightly different when the order is reverse.
+Recall the ANOVA model can be written in a regression framework. The ANOVA tables are constructed
+sequentially with Sum of Squares. We can intepret with the regression sum of squares with a regression
+model with increasing complexity. E.g. For the bone.2 model:
+- 1st row: gender row computes the regression sum of squares for a reduced regression model using
+growth as the response and only gender as categorical predictors (intercept adjustments).
+- 2nd row: bone.dev row computes the adjusted regression SS for the full model - reduced model. E.g.
+The full regression model uses growth as the response and both gender and bone.dev as categorical
+predictors (intercept adjustments).
+- 3rd row: The remaining (residual) sum of squares remaining from the Total SS. Since the reduced
+regression models use different factors in bone.2 vs bone.2rev, the initial sum of squares are differnet
+in the ANOVA tables. Consequently, even though the full models are the same, the adjusted SS will
+be different for the full model in the second row.
+
+Time to add interaction term:
+```{r}
+bone.int = lm(growth ~ gender * bone.dev, data = bone)
+anova(bone.int)
+```
+We can see that the interaction term is insignificant and could be removed from the model and main effects
+interpreted. 
+
+Since we want to examine the effect of bone.dev after accounting for gender, the gender factor should
+be fitted first and then bone.dev. From the above, we know the interaction is insignificant and can be
+dropped. 
+```{r}
+bone.final = lm(growth ~ gender + bone.dev, data = bone)
+bone.final
+plot(bone.final, which = 1:2)
+```
+The diagnostic plots seem to validate the model. There is no pattern in the residual plot vs fitted values, the
+variability seems constant between effects. The normal quantile plot of residuals is closer to linear suggesting
+residuals are close to normally distributed.
+
+## Question 2
+### a
+The scatter plot shows curvature which the simple linear regression model cannot capture.
+
+### b
+In polynomial regression, the lower order terms should not be removed from the model. 
+
+### c
+fev.2 is more appropriate since the highest order term, the cubic coefficient is insignificant.
+
+### d
+Cannot be determined since Age^2 is also a factor.
+
+### e
+2.603109
+
+### f
+It is beyond the range of the data.
+
+### g
+- The curve in the normal quantile plots is approximately linear. Hence, the noise approximately
+satisfy the normality assumption.
+- The residuals in the residual plots do not appear to show any particular pattern. Hence, the noise
+approximately has identical distributions.
+- Hence, both fev.2 and fev.3 seem valid.
+
+
+
+
+
+
+
+
+
+

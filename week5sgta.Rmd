@@ -43,6 +43,6 @@ From the above, 4” metal plate results in a significantly different mean ASI f
 of means studied are significantly different at the 5% level of significance.
 
 ### d
-![Answer](Assets/wk4q1d.png)
+![Answer](Assets/wk5q1d.png)
 
 
